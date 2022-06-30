@@ -9,6 +9,13 @@
       ],
       "moveHistory": [4, 0, 3, 8, 5],
       "winner": 0
+    },
+    {
+      "gameId": "30ea28aa-4fb6-45ac-8960-99e93067759d",
+      "gameType": "S",
+      "playerIds": ["c5ce9e96-b957-42dc-ac10-46e39208e247"],
+      "moveHistory": [4, 3, 6, 8, 2, 5],
+      "winner": 0
     }
   ]
 }

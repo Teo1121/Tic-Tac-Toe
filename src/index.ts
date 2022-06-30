@@ -10,7 +10,49 @@ class TicTacToe {
   gameType: string;
   playerIds: string[];
   moveHistory: number[];
-  winner: number;
+  winner: number; // undefined = no winner, -1 = tie, 0 = player 0, 1 = player 1
+}
+
+function winnerCheck(game: TicTacToe, playerIndex: number): boolean {
+  const player: number[] = [];
+  game.moveHistory.forEach((int, i) => {
+    if ((i + playerIndex + 1) % 2) {
+      player.push(int);
+    }
+  });
+
+  for (let i = 0; i < 3; i++) {
+    // horizontal
+    if (
+      player.includes(0 + 3 * i) &&
+      player.includes(1 + 3 * i) &&
+      player.includes(2 + 3 * i)
+    ) {
+      game.winner = playerIndex;
+      return true;
+    }
+    // vertical
+    if (
+      player.includes(0 + i) &&
+      player.includes(3 + i) &&
+      player.includes(6 + i)
+    ) {
+      game.winner = playerIndex;
+      return true;
+    }
+  }
+  // diagonal
+  if (player.includes(4)) {
+    if (player.includes(0) && player.includes(8)) {
+      game.winner = playerIndex;
+      return true;
+    }
+    if (player.includes(2) && player.includes(6)) {
+      game.winner = playerIndex;
+      return true;
+    }
+  }
+  return false;
 }
 
 app.use(bodyParser.json());
@@ -28,10 +70,10 @@ app.get("/singleplayerGame", (req, res) => {
     winner: undefined,
   };
 
-  data.game.push({});
+  data.game.push(newGame);
   fs.writeFileSync("./data.json", JSON.stringify(data));
 
-  res.json(data);
+  res.json(newGame);
 });
 
 // create multiplayer game
@@ -61,6 +103,7 @@ app.post("/:gameId", (req, res) => {
   );
   const position = req.body.position;
   const playerNum = game.moveHistory.length % 2;
+  let aiMove;
 
   if (game.winner !== undefined) {
     res.status(400);
@@ -75,13 +118,12 @@ app.post("/:gameId", (req, res) => {
     res.json({ message: "Invalid position" });
     return;
   }
-  if (game.gameType === "M") {
-    if (game.playerIds[playerNum] !== req.body.playerId) {
-      // not the players turn or invalid playerId
-      res.status(400);
-      res.json({ message: "Not your turn" });
-      return;
-    }
+
+  if (game.playerIds[playerNum] !== req.body.playerId) {
+    // not the players turn or invalid playerId
+    res.status(400);
+    res.json({ message: "Not your turn or Invalid playedId" });
+    return;
   }
   if (game.moveHistory.includes(position)) {
     // occupied position
@@ -91,39 +133,18 @@ app.post("/:gameId", (req, res) => {
   } else {
     game.moveHistory.push(position);
     if (game.moveHistory.length > 4) {
-      const player: number[] = [];
-      game.moveHistory.forEach((int, i) => {
-        if ((i + playerNum + 1) % 2) {
-          player.push(int);
-        }
-      });
-
-      for (let i = 0; i < 3; i++) {
-        // horizontal
-        if (
-          player.includes(0 + 3 * i) &&
-          player.includes(1 + 3 * i) &&
-          player.includes(2 + 3 * i)
-        ) {
-          game.winner = playerNum;
-        }
-        // vertical
-        if (
-          player.includes(0 + i) &&
-          player.includes(3 + i) &&
-          player.includes(6 + i)
-        ) {
-          game.winner = playerNum;
-        }
+      if (!winnerCheck(game, playerNum) && game.moveHistory.length === 9) {
+        game.winner = -1;
       }
-      // diagonal
-      if (player.includes(4)) {
-        if (player.includes(0) && player.includes(8)) {
-          game.winner = playerNum;
-        }
-        if (player.includes(2) && player.includes(6)) {
-          game.winner = playerNum;
-        }
+    }
+    if (game.gameType === "S" && game.winner === undefined) {
+      do {
+        aiMove = Math.round(Math.random() * 8);
+      } while (game.moveHistory.includes(aiMove));
+
+      game.moveHistory.push(aiMove);
+      if (game.moveHistory.length > 4) {
+        winnerCheck(game, (playerNum + 1) % 2);
       }
     }
     const gameIndex = data.game.findIndex(
@@ -131,8 +152,23 @@ app.post("/:gameId", (req, res) => {
     );
     data.game[gameIndex] = game;
     fs.writeFileSync("./data.json", JSON.stringify(data));
-
-    res.send("Player " + playerNum + " selected position " + position);
+    if (game.gameType === "M") {
+      if (game.winner === playerNum) {
+        res.send("You win!");
+      } else if (game.winner === -1) {
+        res.send("Tie");
+      } else {
+        res.send("Player " + playerNum + " selected position " + position);
+      }
+    } else {
+      if (game.winner === -1) {
+        res.send("Tie");
+      } else if (game.winner !== undefined) {
+        res.send("Player " + game.winner + " has won!");
+      } else {
+        res.send("Ai selected position " + aiMove);
+      }
+    }
   }
 });
 
