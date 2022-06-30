@@ -16,6 +16,21 @@
       "playerIds": ["c5ce9e96-b957-42dc-ac10-46e39208e247"],
       "moveHistory": [4, 3, 6, 8, 2, 5],
       "winner": 0
+    },
+    {
+      "gameId": "6024b560-6b00-4e43-b06f-27215d59397e",
+      "gameType": "S",
+      "playerIds": ["69d78e22-fce8-40ff-9f55-906750c22e4b"],
+      "moveHistory": []
+    },
+    {
+      "gameId": "9a9cd9ac-9ecf-4ff7-8778-dbc1b230118b",
+      "gameType": "M",
+      "playerIds": [
+        "6bb0a427-9693-4e94-be29-b256a94658be",
+        "1ae2fd0c-92bf-44c7-9c18-79c3b7811c81"
+      ],
+      "moveHistory": []
     }
   ]
 }

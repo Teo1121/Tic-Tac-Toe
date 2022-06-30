@@ -101,6 +101,13 @@ app.post("/:gameId", (req, res) => {
   const game: TicTacToe = data.game.find(
     (o: TicTacToe) => o.gameId === req.params.gameId
   );
+  if (game === undefined) {
+    res.status(400);
+    res.json({
+      message: "Cant find game",
+    });
+    return;
+  }
   const position = req.body.position;
   const playerNum = game.moveHistory.length % 2;
   let aiMove;
@@ -154,19 +161,21 @@ app.post("/:gameId", (req, res) => {
     fs.writeFileSync("./data.json", JSON.stringify(data));
     if (game.gameType === "M") {
       if (game.winner === playerNum) {
-        res.send("You win!");
+        res.json({ message: "You win!" });
       } else if (game.winner === -1) {
-        res.send("Tie");
+        res.json({ message: "Tie" });
       } else {
-        res.send("Player " + playerNum + " selected position " + position);
+        res.json({
+          message: "Player " + playerNum + " selected position " + position,
+        });
       }
     } else {
       if (game.winner === -1) {
-        res.send("Tie");
+        res.json({ message: "Tie" });
       } else if (game.winner !== undefined) {
-        res.send("Player " + game.winner + " has won!");
+        res.json({ message: "Player " + game.winner + " has won!" });
       } else {
-        res.send("Ai selected position " + aiMove);
+        res.json({ message: "Ai selected position " + aiMove });
       }
     }
   }
