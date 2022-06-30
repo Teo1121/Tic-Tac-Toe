@@ -1,0 +1,14 @@
+{
+  "game": [
+    {
+      "gameId": "2ef294f0-c9c5-4e81-9fdc-defc88561834",
+      "gameType": "M",
+      "playerIds": [
+        "6b2e5b66-a677-40ad-9b92-2ea04fa8ca9b",
+        "a4386ab5-afb3-4c9c-85c4-c79a9f26c91b"
+      ],
+      "moveHistory": [4, 0, 3, 8, 5],
+      "winner": 0
+    }
+  ]
+}
